@@ -1,0 +1,25 @@
+# Files to exclude from versioning
+bin/
+*.class
+target/
+
+# Maven
+target/
+pom.xml.releaseBackup
+release.properties
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+
+# Generated
+*.log
+*.log.*
+.DS_Store
+*.hprof
+
+# IntelliJ
+*.iml
+.idea/
