@@ -1,6 +1,8 @@
 package com.iheart.interleaver;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
 
@@ -9,12 +11,8 @@ import java.util.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Tests for deprecated Interleaver class.
- */
 @SuppressWarnings("unchecked")
-@Deprecated
-public class InterleaverTest {
+public class InterleavedIteratorTest {
 
     @Test
     public void testEmptySubIterator4() {
@@ -30,12 +28,32 @@ public class InterleaverTest {
         int correctIterationCount = l1.size() + l2.size() + l3.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1, l2, l3))) {
+        List<String> interleaved = Lists.newArrayList(InterleavedIterator.fromIterables(Arrays.asList(l1, l2, l3)));
+        for (String e : interleaved) {
             assertTrue("Correct element is returned.", expectedElement.next().equals(e));
             iterationCount++;
         }
 
         assertTrue("Correct number of elements iterated over", iterationCount == correctIterationCount);
+    }
+
+    @Test
+    public void testIterablesAreConsumed() {
+        List<String> l1 = Lists.newArrayList("a1", "a2", "a3");
+
+        Iterator<String> interleavedStrings = InterleavedIterator.fromIterables(Arrays.asList(l1));
+
+        assertTrue(Lists.newArrayList(interleavedStrings).containsAll(Arrays.asList("a2", "a1", "a3")));
+        //Cannot reuse an iterator.
+        assertTrue(Lists.newArrayList(interleavedStrings).size() == 0);
+
+        List<String> interleavedList = new ArrayList();
+        Iterators.addAll(interleavedList, InterleavedIterator.fromIterables(Arrays.asList(l1)));
+
+        assertTrue(interleavedList.containsAll(Arrays.asList("a2", "a1", "a3")));
+        assertTrue(interleavedList.containsAll(Arrays.asList("a2", "a1", "a3")));
+
+        InterleavingI
     }
 
     @Test
@@ -50,7 +68,7 @@ public class InterleaverTest {
         int correctIterationCount = l1.size() + l2.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1, l2))) {
+        for (String e : Lists.newArrayList(InterleavedIterator.fromIterables(Arrays.asList(l1, l2)))) {
             assertTrue("Correct element is returned.", expectedElement.next().equals(e));
             iterationCount++;
         }
@@ -72,8 +90,8 @@ public class InterleaverTest {
         int correctIterationCount = l1.size() + l2.size() + l3.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1, l2, l3))) {
-            assertTrue("Correct element is returned.", expectedElement.next().equals(e));
+        for (Iterator<String> itr = InterleavedIterator.fromIterables(Arrays.asList(l1, l2, l3)); itr.hasNext();) {
+            assertTrue("Correct element is returned.", expectedElement.next().equals(itr.next()));
             iterationCount++;
         }
 
@@ -92,8 +110,8 @@ public class InterleaverTest {
         int correctIterationCount = l1.size() + l2.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1, l2))) {
-            assertTrue("Correct element is returned.", expectedElement.next().equals(e));
+        for (Iterator<String> itr = InterleavedIterator.fromIterables(Arrays.asList(l1, l2)); itr.hasNext();) {
+            assertTrue("Correct element is returned.", expectedElement.next().equals(itr.next()));
             iterationCount++;
         }
 
@@ -114,8 +132,8 @@ public class InterleaverTest {
         int correctIterationCount = l1.size() + l2.size() + l3.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1, l2, l3))) {
-            assertTrue("Correct element is returned.", expectedElement.next().equals(e));
+        for (Iterator<String> itr = InterleavedIterator.fromIterables(Arrays.asList(l1, l2, l3)); itr.hasNext();) {
+            assertTrue("Correct element is returned.", expectedElement.next().equals(itr.next()));
             iterationCount++;
         }
 
@@ -136,8 +154,8 @@ public class InterleaverTest {
         int correctIterationCount = l1.size() + l2.size() + l3.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1, l2, l3))) {
-            assertTrue("Correct element is returned.", expectedElement.next().equals(e));
+        for (Iterator<String> itr = InterleavedIterator.fromIterables(Arrays.asList(l1, l2, l3)); itr.hasNext();) {
+            assertTrue("Correct element is returned.", expectedElement.next().equals(itr.next()));
             iterationCount++;
         }
 
@@ -156,8 +174,8 @@ public class InterleaverTest {
         int correctIterationCount = l1.size();
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterables(Arrays.asList(l1))) {
-            assertTrue("Correct element is returned.", expectedElement.next().equals(e));
+        for (Iterator<String> itr = InterleavedIterator.fromIterables(Arrays.asList(l1)); itr.hasNext();) {
+            assertTrue("Correct element is returned.", expectedElement.next().equals(itr.next()));
             iterationCount++;
         }
 
@@ -169,7 +187,7 @@ public class InterleaverTest {
 
         List<String> l1 = Collections.emptyList();
 
-        assertFalse("Iterleaving empty list returns no elements.", Interleaver.fromIterables(Arrays.asList(l1)).iterator().hasNext());
+        assertFalse("Iterleaving empty list returns no elements.", InterleavedIterator.fromIterables(Arrays.asList(l1)).hasNext());
 
     }
 
@@ -188,8 +206,9 @@ public class InterleaverTest {
         int correctIterationCount = 9;
         int iterationCount = 0;
 
-        for (String e : Interleaver.fromIterators(lis)) {
-            assertTrue("Correct element is returned.", expectedElement.next().equals(e));
+
+        for (Iterator<String> itr = InterleavedIterator.fromIterators(lis); itr.hasNext();) {
+            assertTrue("Correct element is returned.", expectedElement.next().equals(itr.next()));
             iterationCount++;
         }
 
@@ -223,7 +242,7 @@ public class InterleaverTest {
                 listIndex++;
             }
 
-            Set<String> interleavedInputs = Sets.newHashSet(Interleaver.fromIterables(inputLists));
+            Set<String> interleavedInputs = Sets.newHashSet(InterleavedIterator.fromIterables(inputLists));
             Set<String> flattenedInputs = Sets.newHashSet(Iterables.concat(inputLists));
 
             assertTrue("Interleave contains same items as original", interleavedInputs.equals(flattenedInputs));
