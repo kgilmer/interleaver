@@ -1,5 +1,7 @@
 # Interleaver 
 
+[![Release](https://jitpack.io/v/kgilmer/interleaver.svg)](https://jitpack.io/#kggilmer/interleaver)
+
 Interleave elements from a collection of iterables in Java.
 
 ## Example
@@ -17,3 +19,22 @@ List<String> interleavedElements = Interleaver.fromIterables(Arrays.asList(l1, l
 ## See Also
 
 - https://code.google.com/p/guava-libraries/issues/detail?id=677
+
+
+# Get `interleaver` into your Gradle project
+
+Add it to your build.gradle with:
+```gradle
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+}
+```
+and:
+
+```gradle
+dependencies {
+    compile 'com.github.kgilmer:interleaver:1.0'
+}
+```
